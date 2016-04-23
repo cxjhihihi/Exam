@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wsbm.information.mapper.InfoMapper">
+
+  <resultMap type="com.wsbm.information.model.MesModel" id="model">
+    <id column="ID" jdbcType="INTEGER" property="id"/>
+    <result column="Message" jdbcType="VARCHAR" property="message"/>
+    <result column="Type" jdbcType="INTEGER" property="type"/>
+  </resultMap>
+  
+  <select id="getMessageModel" parameterType="int" resultMap="model">
+  	SELECT * FROM mes_model WHERE Type = #{status}
+  </select>
+  
+  <update id="updateMessageModel" parameterType="com.wsbm.information.model.MesModel">
+  	UPDATE mes_model SET Message = #{message} WHERE Type = #{type}
+  </update>
+  
+</mapper>

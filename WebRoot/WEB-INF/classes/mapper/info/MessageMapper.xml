@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wsbm.information.mapper.InfoMapper">
+
+  <resultMap type="com.wsbm.information.model.Message" id="message">
+    <id column="M_ID" jdbcType="INTEGER" property="m_id"/>
+    <result column="M_Content" jdbcType="VARCHAR" property="m_content"/>
+    <result column="M_Globale" jdbcType="INTEGER" property="m_globale"/>
+    <result column="M_Time" jdbcType="DATE" property="m_time"/>
+    <result column="M_Read" jdbcType="INTEGER" property="m_read"/>
+    <association property="m_to" column="M_To" select="getUserInfo"></association>
+    <association property="m_from" column="M_From" select="getRoleById"></association>
+  </resultMap>
+  
+  <select id="getUserInfo" parameterType="String" resultType="com.wsbm.login.model.User">
+    SELECT * FROM user WHERE ID = #{id}
+  </select>
+  
+  <select id="getRoleById" parameterType="int" resultType="com.wsbm.login.model.Admin">
+  	SELECT * FROM role WHERE R_ID = #{id}
+  </select>
+  
+  <insert id="sendMessage" parameterType="com.wsbm.information.model.Message">
+  	INSERT INTO message (M_Content, M_Globale, M_Time, M_Read, M_To, M_From)
+  		VALUES (#{m_content}, #{m_globale}, #{m_time}, #{m_read}, #{m_to2}, #{m_from2})
+  </insert>
+  
+  <select id="getMessage" parameterType="String" resultMap="message">
+  	SELECT * FROM message WHERE M_To = #{id} AND M_Read = 0
+  </select>
+  
+  <update id="changeReaded" parameterType="String">
+  	UPDATE message SET M_Read = 1 WHERE M_To = #{id} AND M_Read = 0
+  </update>
+  
+  <select id="getAllMessage" parameterType="String" resultMap="message">
+  	SELECT * FROM message WHERE M_To = #{id}
+  </select>
+  
+  <update id="changeReaderById" parameterType="int">
+  	UPDATE message SET M_Read = 1 WHERE M_ID = #{id}
+  </update>
+  
+  <select id="queryMessage" parameterType="com.wsbm.information.model.Conditions" resultMap="message">
+  	SELECT * FROM message WHERE M_To = #{name}
+  	<if test="status == 0 or status == 1">
+  		AND M_Read = #{status}
+  	</if>
+  </select>
+  
+</mapper>

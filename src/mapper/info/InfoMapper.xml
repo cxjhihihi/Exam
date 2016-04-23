@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wsbm.information.mapper.InfoMapper">
+
+  <resultMap type="com.wsbm.information.model.Info" id="Info">
+    <result column="ID" jdbcType="INTEGER" property="id"/>
+    <result column="Name" jdbcType="VARCHAR" property="name"/>
+    <result column="Sex" jdbcType="VARCHAR" property="sex"/>
+    <result column="Birth" jdbcType="VARCHAR" property="birth"/>
+    <result column="Picture" jdbcType="VARCHAR" property="picture"/>
+    <result column="IDCard" jdbcType="VARCHAR" property="idCard"/>
+    <result column="Phone_1" jdbcType="VARCHAR" property="phone_1"/>
+    <result column="SchoolAddress" jdbcType="VARCHAR" property="schoolAddress"/>
+    <result column="HouseholdAddress" jdbcType="VARCHAR" property="householdAddress"/>
+    <result column="School" jdbcType="VARCHAR" property="school"/>
+    <result column="Class" jdbcType="VARCHAR" property="sclass"/>
+    <result column="HomeAddress" jdbcType="VARCHAR" property="homeAddress"/>
+    <result column="Phone_2" jdbcType="VARCHAR" property="phone_2"/>
+    <result column="Account" jdbcType="VARCHAR" property="account"/>
+    <result column="Status" jdbcType="INTEGER" property="status"/>
+    <result column="Teacher" jdbcType="INTEGER" property="teacher"/>
+    <result column="Time" jdbcType="VARCHAR" property="time"/>
+    <result column="Enter" jdbcType="INTEGER" property="enter"/>
+    <collection property="admin" ofType="com.wsbm.login.model.Admin">
+	    <id column="R_ID" jdbcType="INTEGER" property="r_id"/>
+	    <result column="R_Account" jdbcType="VARCHAR" property="r_account"/>
+	    <result column="R_Pwd" jdbcType="VARCHAR" property="r_pwd"/>
+	    <result column="R_Name" jdbcType="VARCHAR" property="r_name"/>
+	    <result column="R_Role" jdbcType="INTEGER" property="r_role"/>
+    </collection>
+  </resultMap>
+
+  <select id="getInfo" parameterType="String" resultMap="Info">
+    SELECT * FROM info WHERE Account = #{id}
+  </select>
+  
+  <select id="getStuInfo" parameterType="String" resultMap="Info">
+    SELECT * FROM info WHERE ID = #{id}
+  </select>
+  
+  <insert id="saveInfo" parameterType="com.wsbm.information.model.Info" useGeneratedKeys="true">
+    <![CDATA[INSERT INTO info
+    (
+        ID, Name, Sex, Birth, Picture, IDCard, Phone_1,
+	    SchoolAddress, HouseholdAddress, School, Class, HomeAddress,
+	    Phone_2, Account, Enter, 
+	    Status, Time
+    )
+    VALUES
+    (   
+        #{id}, #{name}, #{sex}, #{birth}, #{picture}, #{idCard}, #{phone_1},
+	    #{schoolAddress}, #{householdAddress}, #{school}, #{sclass}, #{homeAddress},
+	    #{phone_2},#{account}, #{enter},
+	    #{status}, #{time}
+    )
+    ]]>
+  </insert>
+  
+  <delete id="deleteInfo" parameterType="String">
+    DELETE FROM info WHERE Account = #{account}
+  </delete>
+  
+  <update id="cancelInfo" parameterType="String">
+  	UPDATE info SET Enter = 2 WHERE ID = #{id}
+  </update>
+  
+  <select id="getCount" parameterType="com.wsbm.information.model.Time" resultType="int">
+  	SELECT count(*) FROM info WHERE Enter = 1 AND Time between #{startTime} AND #{endTime}
+  </select>
+  
+  <select id="getAllInfo" parameterType="com.wsbm.information.model.Time" resultMap="Info">
+  	SELECT * FROM info AS a LEFT JOIN role AS b ON a.Teacher = b.R_ID 
+  		WHERE a.Enter = 1 AND a.Time between #{startTime} AND #{endTime}
+  		ORDER BY Time LIMIT #{id}, 20
+  </select>
+  
+  <select id="getInfoByConditions" parameterType="com.wsbm.information.model.Conditions" resultMap="Info">
+  	SELECT * FROM info AS a LEFT JOIN role AS b ON a.Teacher = b.R_ID 
+  		WHERE a.Enter = 1 AND a.Time between #{startTime} AND #{endTime}
+  		<if test="name != null and !&quot;&quot;.equals(name)">
+  			AND b.R_Name = #{name} 
+  		</if>
+  		<if test="status == 0 or status ==1 or status == 2">
+  			AND a.Status = #{status} 
+  		</if>
+  		ORDER BY Time LIMIT #{paging}, 20
+  </select>
+  
+  <select id="getCountByConditions" parameterType="com.wsbm.information.model.Conditions" resultType="int">
+  	SELECT count(*) FROM info AS a LEFT JOIN role AS b ON a.Teacher = b.R_ID 
+  		WHERE a.Enter = 1 AND a.Time between #{startTime} AND #{endTime}
+  		<if test="name != null and !&quot;&quot;.equals(name)">
+  			AND b.R_Name = #{name} 
+  		</if>
+  		<if test="status == 0 or status ==1 or status == 2">
+  			AND a.Status = #{status} 
+  		</if>
+  </select>
+  
+  <select id="getAudit" resultMap="Info">
+  	SELECT * FROM info WHERE Teacher IS NULL ORDER BY RAND() LIMIT 1
+  </select>
+  
+  <select id="getLastAudit" parameterType="int" resultMap="Info">
+  	SELECT * FROM info WHERE Teacher = #{id} AND Status = 0
+  </select>
+  
+  <update id="updateAudit" parameterType="com.wsbm.information.model.Time">
+  	UPDATE info SET Teacher = #{id} WHERE ID = #{name}
+  </update>
+  
+  <update id="updateAuditStatus" parameterType="com.wsbm.information.model.Time">
+  	UPDATE info SET Status = #{id} WHERE ID = #{name}
+  </update>
+  
+  <select id="getAllAudit" parameterType="int" resultMap="Info">
+  	SELECT * FROM info WHERE Teacher = #{id}
+  </select>
+  
+  <select id="queryAudit" parameterType="com.wsbm.information.model.Conditions" resultMap="Info">
+	SELECT * FROM info WHERE Teacher = #{paging}
+	<if test="status ==1 or status == 2">
+		AND Status = #{status}
+	</if>
+	<if test="name != null and !&quot;&quot;.equals(name)">
+		AND Name LIKE concat(concat('%', #{name}, '%'), '%')
+	</if>
+  </select>
+  
+</mapper>

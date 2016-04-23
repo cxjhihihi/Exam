@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wsbm.login.mapper.RoleMapper">
+
+  <resultMap type="com.wsbm.login.model.Admin" id="admin">
+    <id column="R_ID" jdbcType="INTEGER" property="r_id"/>
+    <result column="R_Account" jdbcType="VARCHAR" property="r_account"/>
+    <result column="R_Pwd" jdbcType="VARCHAR" property="r_pwd"/>
+    <result column="R_Name" jdbcType="VARCHAR" property="r_name"/>
+    <result column="R_Role" jdbcType="INTEGER" property="r_role"/>
+  </resultMap>
+
+  <select id="checkLogin" parameterType="com.wsbm.login.model.Admin" resultType="boolean">
+   <![CDATA[SELECT count(*) FROM role WHERE R_Account = #{r_account} AND R_Pwd = #{r_pwd}]]>
+  </select>
+
+  <select id="getAdminInfo" parameterType="com.wsbm.login.model.Admin" resultMap="admin">
+    SELECT * FROM role WHERE R_Account = #{r_account} AND R_Pwd = #{r_pwd}
+  </select>
+  
+  <update id="updatePwd" parameterType="com.wsbm.login.model.Admin">
+  	UPDATE role SET R_Pwd = #{r_pwd} WHERE R_ID = #{r_id} AND R_Pwd = #{r_name} AND R_Role = #{r_role}
+  </update>
+  
+  <select id="getAllRole" resultMap="admin">
+  	SELECT * FROM role
+  </select>
+  
+  <delete id="deleteRole" parameterType="int">
+  	DELETE FROM role WHERE R_ID in 
+  	<foreach collection="array" index="index" item="intIdArray" open="(" separator="," close=")">
+  		#{intIdArray}
+  	</foreach>
+  </delete>
+  
+  <insert id="saveRole" parameterType="com.wsbm.login.model.Admin" useGeneratedKeys="true">
+  	<![CDATA[INSERT INTO role (R_Account, R_Pwd, R_Name, R_Role)
+  		VALUES(#{r_account}, #{r_pwd}, #{r_name}, #{r_role})
+  	]]>
+  </insert>
+  
+  <update id="updateRole" parameterType="com.wsbm.login.model.Admin">
+  	<![CDATA[
+  		UPDATE role SET R_Account = #{r_account}, R_Pwd = #{r_pwd},
+  			R_Name = #{r_name}, R_Role = #{r_role} WHERE R_ID = #{r_id}
+  	]]>
+  </update>
+  
+  <select id="getRoleById" parameterType="int" resultMap="admin">
+  	SELECT * FROM role WHERE R_ID = #{id}
+  </select>
+  
+</mapper>

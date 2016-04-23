@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wsbm.login.mapper.UserMapper">
+
+  <resultMap type="com.wsbm.login.model.User" id="User">
+    <result column="ID" jdbcType="VARCHAR" property="id"/>
+    <result column="Name" jdbcType="VARCHAR" property="name"/>
+    <!-- <result column="Age" jdbcType="INTEGER" property="age"/> -->
+    <result column="Sex" jdbcType="VARCHAR" property="sex"/>
+    <result column="Pwd" jdbcType="VARCHAR" property="pwd"/>
+    <!-- <result column="Picture" jdbcType="VARCHAR" property="picture"/> -->
+    <result column="Birth" jdbcType="VARCHAR" property="birth"/>
+  </resultMap>
+
+  <select id="checkLogin" parameterType="com.wsbm.login.model.User" resultType="boolean">
+   <![CDATA[SELECT count(*) FROM user WHERE ID = #{id} AND Pwd = #{pwd}]]>
+  </select>
+
+  <select id="getUserInfo" parameterType="String" resultMap="User">
+    SELECT * FROM user WHERE ID = #{id}
+  </select>
+  
+  <update id="updatePwd" parameterType="com.wsbm.login.model.User">
+  	<![CDATA[
+  		UPDATE user SET Pwd = #{pwd} WHERE ID = #{id} AND Pwd = #{name}
+  	]]>
+  </update>
+  
+  <insert id="registerUser" parameterType="com.wsbm.login.model.User">
+  	<![CDATA[
+  		INSERT INTO user(
+  			ID, Name, Sex, Pwd, Birth
+  		)
+  		VALUES(
+  			#{id}, #{name}, #{sex}, #{pwd}, #{birth}
+  		)
+  	]]>
+  </insert>
+
+</mapper>

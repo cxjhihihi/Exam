@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wsbm.information.mapper.TimeMapper">
+
+  <resultMap type="com.wsbm.information.model.Time" id="time">
+    <id column="ID" jdbcType="INTEGER" property="id"/>
+    <result column="Name" jdbcType="VARCHAR" property="name"/>
+    <result column="Start_Time" jdbcType="DATE" property="startTime"/>
+    <result column="End_Time" jdbcType="DATE" property="endTime"/>
+    <result column="Status" jdbcType="INTEGER" property="status"/>
+  </resultMap>
+  
+  <insert id="saveTime" parameterType="com.wsbm.information.model.Time" useGeneratedKeys="true">
+    <![CDATA[INSERT INTO time
+    (
+        Name, Start_Time, End_Time, Status
+    )
+    VALUES
+    (   
+       #{name}, #{startTime}, #{endTime}, #{status}
+    )
+    ]]>
+  </insert>
+  
+  <select id="getTime" resultMap="time">
+  	SELECT * FROM time WHERE Name = '报名时间' AND Status = 0
+  </select>
+  
+  <update id="updateTime" parameterType="com.wsbm.information.model.Time">
+  	<![CDATA[
+  		UPDATE time SET Start_Time = #{startTime}, End_Time = #{endTime}
+  		WHERE ID = #{id}
+  	]]>
+  </update>
+  
+</mapper>

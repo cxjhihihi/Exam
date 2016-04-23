@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wsbm.prepared.mapper.PreMapper">
+
+  <resultMap type="com.wsbm.prepared.model.ExamRoom" id="exam_room">
+  	<id column="E_ID" jdbcType="INTEGER" property="e_id"/>
+    <result column="E_Name" jdbcType="VARCHAR" property="e_name"/>
+    <result column="E_Num" jdbcType="INTEGER" property="e_num"/>
+    <result column="E_Remain" jdbcType="INTEGER" property="e_remain"/>
+    <result column="E_StartTime" jdbcType="VARCHAR" property="e_startTime"/>
+    <result column="E_EndTime" jdbcType="VARCHAR" property="e_endTime"/>
+    <result column="E_Start" jdbcType="INTEGER" property="e_start"/>
+    <result column="E_School_Id" jdbcType="INTEGER" property="e_school_id"/>
+    <result column="E_Course_Id" jdbcType="INTEGER" property="e_course_id"/>
+    <association property="e_school" column="E_School" select="selectById"></association>
+  	<association property="e_course" column="E_Course" select="selectById"></association>
+
+  </resultMap>
+  
+  <select id="selectById" parameterType="int" resultType="com.wsbm.prepared.model.Dict">
+ 	SELECT * FROM dict WHERE D_ID = #{id}
+  </select>
+  
+  <select id="getRoom" resultMap="exam_room">
+  	SELECT * FROM exam_room
+  </select>
+  
+  <insert id="saveRoom" parameterType="com.wsbm.prepared.model.ExamRoom">
+  	<![CDATA[
+  		INSERT INTO exam_room (E_Name, E_Num, E_Remain, E_StartTime, E_EndTime,
+  			 E_School_Id, E_Course_id, E_Start) VALUES (#{e_name}, #{e_num}, #{e_num}, 
+  			 #{e_startTime}, #{e_endTime}, #{e_school_id}, #{e_course_id}, 0)
+  	]]>
+  </insert>
+  
+  <select id="getRoomById" parameterType="int" resultMap="exam_room">
+  	SELECT * FROM exam_room WHERE E_ID = #{id}
+  </select>
+  
+  <delete id="deleteRoom" parameterType="int">
+	DELETE FROM exam_room WHERE E_ID IN
+	<foreach collection="array" index="index" item="ids" open="(" separator="," close=")">
+		#{ids}
+	</foreach>
+  </delete>
+  
+  <update id="openRoom" parameterType="int">
+  	UPDATE exam_room SET E_Start = 1 WHERE E_ID IN
+  	<foreach collection="array" index="index" item="ids" open="(" separator="," close=")">
+		#{ids}
+	</foreach>
+  </update>
+  
+  <update id="updateRoom" parameterType="com.wsbm.prepared.model.ExamRoom">
+  	<![CDATA[
+  		UPDATE exam_room SET E_Name = #{e_name}, E_Num = #{e_num}, E_Remain = #{e_num},
+  			E_StartTime = #{e_startTime}, E_EndTime = #{e_endTime}, E_School_Id = #{e_school_id},
+  			E_Course_Id = #{e_course_id} WHERE E_ID = #{e_id} AND E_Start = 0
+  	]]>
+  </update>
+  
+  <select id="getTicket" parameterType="String" resultMap="exam_room">
+  	SELECT * FROM exam_room WHERE E_StartTime > #{time} AND E_Start = 1
+  </select>
+  
+  <update id="updateRemain" parameterType="com.wsbm.prepared.model.ExamRoom">
+  	UPDATE exam_room SET E_Remain = #{e_remain} WHERE E_ID = #{e_id}
+  </update>
+  
+</mapper>

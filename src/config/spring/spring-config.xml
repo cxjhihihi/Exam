@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+       http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.1.xsd
+       http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd
+       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
+       "> 
+       
+       <!-- 扫描文件(自动将service层注入) -->
+       <context:component-scan base-package="com.wsbm.*.service" />
+       <!-- 扫描文件(自动将dao层注入) -->
+       <context:component-scan base-package="com.wsbm.*.mapper" />
+       
+       <!-- 引入jdbc配置文件 -->
+       <bean id="propertyConfigurer"
+       		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+      		<property name="location">
+      			<value>classpath:config/jdbc/jdbc.properties</value>
+      		</property>
+       </bean>
+     
+     	<!-- 加载数据源 -->
+     	<bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource"
+     		init-method="init" destroy-method="close">
+     		<property name="driverClassName">
+     			<value>${jdbc_driverClassName}</value>
+     		</property>
+     		<property name="url">
+     			<value>${jdbc_url}</value>
+     		</property>
+     		<property name="username">
+     			<value>${jdbc_username}</value>
+     		</property>
+     		<property name="password">
+     			<value>${jdbc_password}</value>
+     		</property>
+     		<!-- 链接池最大使用连接数 -->
+     		<property name="maxActive">
+     			<value>50</value>
+     		</property>
+     		<!-- 初始化连接大小 -->
+     		<property name="initialSize">
+     			<value>1</value>
+     		</property>
+     		<!-- 获取连接最大等待时间 -->
+     		<property name="maxWait">
+     			<value>60000</value>
+     		</property>
+     		<!-- 连接池最大空闲 -->
+     		<property name="maxIdle">
+     			<value>50</value>
+     		</property>
+     		<!-- 连接池最小空闲 -->
+     		<property name="minIdle">
+     			<value>3</value>
+     		</property>
+     		<!-- 自动清除无用连接 -->
+     		<property name="removeAbandoned">
+     			<value>true</value>
+     		</property>
+     		<!-- 清除无用连接的等待时间 -->
+     		<property name="removeAbandonedTimeout">
+     			<value>180</value>
+     		</property>
+     		<!-- 连接属性 -->
+     		<property name="connectionProperties">
+     			<value>clientEncoding=UTF-8</value>
+     		</property>
+     	</bean>
+     	
+     	<!-- 配置Mybatis的sqlSessionFactory -->
+     	<bean id="sqlSessionFactory" 
+     		class="org.mybatis.spring.SqlSessionFactoryBean">
+     		<property name="dataSource" ref="dataSource" />
+     		<!-- 自动扫描mapper.xml文件 -->
+     		<property name="mapperLocations">
+     			<value>classpath:mapper/*/*.xml</value>
+     		</property>
+     		<!-- Mybatis的配置文件 -->
+     		<property name="configLocation">
+     			<value>classpath:config/mybatis/Configuration.xml</value>
+     		</property>
+     	</bean>
+     	
+     	<!-- dao接口所在包名，spring会自动查找其下的类 -->
+     	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+     		<property name="basePackage">
+     			<value>com.wsbm.*.mapper</value>
+     		</property>
+     		<property name="sqlSessionFactoryBeanName">
+     			<value>sqlSessionFactory</value>
+     		</property>
+     	</bean>
+     	
+     	<!-- 对数据源进行事务管理 -->
+     	<bean id="transactionManager"
+     		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+     		<property name="dataSource" ref="dataSource" />
+     	</bean>
+     	
+     	<!-- 配置事务通知属性 (当对数据库表中数据进行增删改时，必须配置事务，当操作失败后进行回滚操作)-->
+     	<tx:advice id="txAdvice" transaction-manager="transactionManager">
+     		<!-- 定义事务传播属性 -->
+     		<tx:attributes>
+     			<!-- 对所有以save开头的方法进行事务管理 -->
+     			<tx:method name="save*" propagation="REQUIRED"/>
+     			<!-- 对所有以delete开头的方法进行事务管理 -->
+     			<tx:method name="delete*" propagation="REQUIRED"/>
+     			<!-- 对所有以update开头的方法进行事务管理 -->
+     			<tx:method name="update*" propagation="REQUIRED"/>
+     			<!-- 对所有以print开头的方法进行事务管理 -->
+     			<tx:method name="print*" propagation="REQUIRED"/>
+     		</tx:attributes>
+     	</tx:advice>
+     	
+     	<!-- 配置事务切面 -->
+     	<aop:config>
+     		<!-- 进行回滚操作时回滚到service中的方法 -->
+     		<aop:pointcut id="serviceOperation"
+     			expression="execution(* com.wsbm.*.service.*.*(..))" />
+     		<aop:advisor advice-ref="txAdvice" pointcut-ref="serviceOperation"/>
+     	</aop:config>
+       
+</beans>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wsbm.prepared.mapper.PreMapper">
+
+  <resultMap type="com.wsbm.prepared.model.Ticket" id="ticket">
+    <id column="T_ID" jdbcType="INTEGER" property="t_id"/>
+    <result column="T_Seat" jdbcType="INTEGER" property="t_seat"/>
+    <association property="t_user" column="T_StuID" select="getInfoById"></association>
+    <association property="t_room" column="T_ExamID" select="getRoomById"></association>
+  </resultMap>
+  
+  <select id="getInfoById" parameterType="String" resultType="com.wsbm.information.model.Info">
+  	SELECT * FROM info WHERE ID = #{id}
+  </select>
+  
+  <select id="getPrintTicket" parameterType="String" resultMap="ticket">
+  	SELECT * FROM ticket WHERE T_StuID = #{stuId}
+  </select>
+  
+  <insert id="saveTicket" parameterType="com.wsbm.prepared.model.Ticket" keyProperty="t_id" useGeneratedKeys="true">
+  	<![CDATA[
+	  	INSERT INTO ticket (T_StuID, T_ExamID, T_Seat)
+	  		VALUES (#{t_stuId}, #{t_examId}, #{t_seat})
+  	]]>
+  </insert>
+  
+  <select id="getTicketById" parameterType="int" resultMap="ticket">
+  	SELECT * FROM ticket WHERE T_ID = #{id}
+  </select>
+   <select id="getTicketsByExamId" parameterType="int" resultMap="ticket">
+  	SELECT * FROM ticket WHERE T_EXAMID = #{0}
+  </select>
+
+</mapper>

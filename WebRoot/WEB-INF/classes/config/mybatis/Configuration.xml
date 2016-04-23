@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+    PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+  <!-- <settings>
+  	允许JDBC支持生成的键	true 允许 false 不允许
+    <setting name="useGeneratedKeys" value="false"/>
+    使用列标签代替列名 	true 使用 false 不使用
+    <setting name="useColumnLabel" value="true"/>
+  </settings>
+
+  数据源配置
+  <environments default="development">
+    <environment id="development">
+      <transactionManager type="JDBC">
+        <property name="" value=""/>
+      </transactionManager>
+      <dataSource type="UNPOOLED">
+        <property name="driver" value="com.mysql.jdbc.Driver"/>
+        <property name="url" value="jdbc:mysql://localhost:3306/test"/>
+        <property name="username" value="root"/>
+        <property name="password" value="20121221"/>
+      </dataSource>
+    </environment>
+  </environments> -->
+  
+  <typeAliases></typeAliases>
+
+  <mappers></mappers>
+
+</configuration>

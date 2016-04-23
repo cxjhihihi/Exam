@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wsbm.prepared.mapper.PreMapper">
+
+  <resultMap type="com.wsbm.prepared.model.Dict" id="dict">
+    <id column="D_ID" jdbcType="INTEGER" property="d_id"/>
+    <result column="D_Type" jdbcType="VARCHAR" property="d_type"/>
+    <result column="D_Code" jdbcType="VARCHAR" property="d_code"/>
+    <result column="D_Name" jdbcType="VARCHAR" property="d_name"/>
+  </resultMap>
+  
+  <select id="getDict" parameterType="String" resultMap="dict">
+  	SELECT * FROM dict WHERE D_Type = #{type}
+  </select>
+  
+  <insert id="saveDict" parameterType="com.wsbm.prepared.model.Dict" useGeneratedKeys="true">
+	<![CDATA[
+		INSERT INTO dict (D_Type, D_Code, D_Name) VALUES (#{d_type}, #{d_code}, #{d_name})
+	]]>  
+  </insert>
+  
+  <delete id="deleteDict" parameterType="int">
+  	DELETE FROM dict WHERE D_ID in 
+  	<foreach collection="array" index="index" item="intIdArray" open="(" separator="," close=")">
+  		#{intIdArray}
+  	</foreach>
+  </delete>
+  
+  <update id="updateDict" parameterType="com.wsbm.prepared.model.Dict">
+  	<![CDATA[
+  		UPDATE dict SET D_Code = #{d_code}, D_Name = #{d_name} 
+  		WHERE D_ID = #{d_id} AND D_Type = #{d_type}
+  	]]>
+  </update>
+  
+  <select id="getDictById" parameterType="int" resultMap="dict">
+  	SELECT * FROM dict WHERE D_ID = #{d_id}
+  </select>
+
+</mapper>
